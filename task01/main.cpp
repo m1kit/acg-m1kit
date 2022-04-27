@@ -18,19 +18,30 @@ Eigen::Matrix<double, 4, 4, Eigen::RowMajor> GetHomographicTransformation(
     { +0.5, +0.5 },
     { -0.5, +0.5 }
   };
+
+  Eigen::Matrix<double, 8, 8, Eigen::RowMajor> a;
+  Eigen::Vector<double, 8> b;
+  for (int i = 0; i < 4; i++) {
+    int ix = i * 2, iy = i * 2 + 1;
+    a(ix, 0) = a(iy, 3) = c0[i][0];
+    a(ix, 1) = a(iy, 4) = c0[i][1];
+    a(ix, 2) = a(iy, 5) = 1;
+    a(ix, 6)            = -c0[i][0] * c1[i][0];
+    a(ix, 7)            = -c0[i][1] * c1[i][0];
+    a(iy, 6)            = -c0[i][0] * c1[i][1];
+    a(iy, 7)            = -c0[i][1] * c1[i][1];
+    b(ix)               = c1[i][0];
+    b(iy)               = c1[i][1];
+    a(ix, 3) = a(ix, 4) = a(ix, 5) = a(iy, 0) = a(iy, 1) = a(iy, 2) = 0;
+  }
+  Eigen::Vector<double, 8> x = a.colPivHouseholderQr().solve(b);
+
   Eigen::Matrix<double, 4, 4, Eigen::RowMajor> m;
   // set identity as default
-  m << 1, 0, 0, 0,
-      0, 1, 0, 0,
+  m << x(0), x(1), 0, x(2),
+      x(3), x(4), 0, x(5),
       0, 0, 1, 0,
-      0, 0, 0, 1;
-  // write some code to compute the 4x4 Homographic transformation matrix `m`;
-  // `m` should transfer :
-  // (c0[0][0],c0[][1],z) -> (c1[0][0],c1[0][1],z)
-  // (c0[1][0],c0[][1],z) -> (c1[1][0],c1[1][1],z)
-  // (c0[2][0],c0[][1],z) -> (c1[2][0],c1[2][1],z)
-  // (c0[3][0],c0[][1],z) -> (c1[3][0],c1[3][1],z)
-
+      x(6), x(7), 0, 1;
   return m;
 }
 
