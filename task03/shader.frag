@@ -26,8 +26,26 @@ float SDF(vec3 pos)
   // Look Inigo Quilez's article for hints:
   // https://iquilezles.org/articles/distfunctions/
 
-  // for "problem2" the code below is not used.
-  return sdf_box(pos, vec3(0.1,0.2,0.3));
+  float x = pos.x;
+  float y = pos.y;
+  float z = pos.z;
+  // distance from the origin
+  float big_r = sqrt(x*x + y*y + z*z);
+  // the signed distance, initialized with it from the big sphere
+  float v = big_r - 0.8;
+  // put 11x11x11 spheres
+  for (int i = -5; i <= 5; i++) {
+    for (int j = -5; j <= 5; j++) {
+      for (int k = -5; k <= 5; k++) {
+        float dx = x - i * 0.2;
+        float dy = y - j * 0.2;
+        float dz = z - k * 0.2;
+        float small_r = sqrt(dx*dx + dy*dy + dz*dz);
+        v = max(v, 0.12 - small_r);
+      }
+    }
+  }
+  return v;
 }
 
 void main()
