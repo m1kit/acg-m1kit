@@ -36,6 +36,6 @@ void main()
 
     float x1 = x0 / xy * angle;
     float y1 = y0 / xy * angle;
-    float z1 = z0;
-    gl_Position = vec4(x1, y1, z0, 1); // homogenious coordinate
+    float z1 = (2 / sqrt(3)) * r - 1;
+    gl_Position = vec4(x1, y1, z1, 1); // homogenious coordinate
 }
